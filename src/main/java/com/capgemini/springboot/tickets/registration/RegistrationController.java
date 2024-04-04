@@ -1,5 +1,6 @@
 package com.capgemini.springboot.tickets.registration;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +23,7 @@ public class RegistrationController {
     }
 
     @PostMapping
-    public Registration create(@RequestBody Registration registration) {
+    public Registration create(@RequestBody @Valid Registration registration) {
         return registrationRepository.create(registration);
     }
 
