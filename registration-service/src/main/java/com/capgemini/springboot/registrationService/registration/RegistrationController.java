@@ -24,8 +24,8 @@ public class RegistrationController {
     private final EventsClient eventsClient;
     private final RegistrationRepository registrationRepository;
 
-    public RegistrationController(WebClient webClient, RegistrationRepository registrationRepository) {
-        this.webClient = webClient;
+    public RegistrationController(EventsClient eventsClient, RegistrationRepository registrationRepository) {
+        this.eventsClient = eventsClient;
         this.registrationRepository = registrationRepository;
     }
 
