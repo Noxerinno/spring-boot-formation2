@@ -1,6 +1,10 @@
-package com.capgemini.springboot.tickets.registration;
+package com.capgemini.springboot.registrationService.registration;
 
+import com.capgemini.springboot.registrationService.events.Event;
+import com.capgemini.springboot.registrationService.events.Product;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -17,17 +22,36 @@ import java.util.UUID;
 @RequestMapping(path = "/registrations")
 public class RegistrationController {
 
+    private final WebClient webClient;
     private final RegistrationRepository registrationRepository;
 
-    public RegistrationController(RegistrationRepository registrationRepository) {
+    public RegistrationController(WebClient webClient, RegistrationRepository registrationRepository) {
+        this.webClient = webClient;
         this.registrationRepository = registrationRepository;
     }
 
     @PostMapping
     public Registration create(@RequestBody @Valid Registration registration) {
+        Product product = webClient.get()
+                .uri("/products/{id}", registration.productId())
+//                .uri(uriBuilder -> uriBuilder
+//                        .path("/products/")
+//                        .queryParam("eventId", registration.productId())
+//                        .build())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .retrieve()
+                .bodyToMono(Product.class)
+                .block();
+
+        Event event = webClient.get()
+                .uri("/events/{id}", product.eventId())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .retrieve()
+                .bodyToMono(Event.class)
+                .block();
         String ticketCode = UUID.randomUUID().toString();
 
-        return registrationRepository.save(new Registration(null, registration.productId(), ticketCode, registration.attendeeName()));
+        return registrationRepository.save(new Registration(null, registration.productId(), event.name(), product.price(), ticketCode, registration.attendeeName()));
     }
 
     @GetMapping(path = "/{ticketCode}")
@@ -44,7 +68,7 @@ public class RegistrationController {
                 .orElseThrow(() -> new NoSuchElementException("Registration with ticket code " + ticketCode + " not found"));
 
         //Only update the attendee name
-        return registrationRepository.save(new Registration(existing.id(), existing.productId(), ticketCode, registration.attendeeName()));
+        return registrationRepository.save(new Registration(existing.id(), existing.productId(), existing.eventName(), existing.amount(), ticketCode, registration.attendeeName()));
     }
 
     @DeleteMapping(path = "/{ticketCode}")

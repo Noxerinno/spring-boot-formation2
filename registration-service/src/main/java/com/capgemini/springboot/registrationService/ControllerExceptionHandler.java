@@ -1,4 +1,4 @@
-package com.capgemini.springboot;
+package com.capgemini.springboot.registrationService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponse;

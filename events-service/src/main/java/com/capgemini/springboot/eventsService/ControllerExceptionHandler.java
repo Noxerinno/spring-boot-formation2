@@ -1,4 +1,4 @@
-package com.capgemini.springboot.tickets;
+package com.capgemini.springboot.eventsService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponse;

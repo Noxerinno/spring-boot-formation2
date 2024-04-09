@@ -1,13 +1,13 @@
-package com.capgemini.springboot;
+package com.capgemini.springboot.registrationService;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class EventsServiceApplication {
+public class RegistrationServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EventsServiceApplication.class, args);
+		SpringApplication.run(RegistrationServiceApplication.class, args);
 	}
 
 }

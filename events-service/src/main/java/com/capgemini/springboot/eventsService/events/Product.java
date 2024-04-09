@@ -1,4 +1,4 @@
-package com.capgemini.springboot.events;
+package com.capgemini.springboot.eventsService.events;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

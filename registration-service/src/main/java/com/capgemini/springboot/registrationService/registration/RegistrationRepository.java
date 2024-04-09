@@ -1,4 +1,4 @@
-package com.capgemini.springboot.tickets.registration;
+package com.capgemini.springboot.registrationService.registration;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
