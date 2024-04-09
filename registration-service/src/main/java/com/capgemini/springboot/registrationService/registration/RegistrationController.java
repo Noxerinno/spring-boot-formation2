@@ -1,10 +1,9 @@
 package com.capgemini.springboot.registrationService.registration;
 
 import com.capgemini.springboot.registrationService.events.Event;
+import com.capgemini.springboot.registrationService.events.EventsClient;
 import com.capgemini.springboot.registrationService.events.Product;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +21,7 @@ import java.util.UUID;
 @RequestMapping(path = "/registrations")
 public class RegistrationController {
 
-    private final WebClient webClient;
+    private final EventsClient eventsClient;
     private final RegistrationRepository registrationRepository;
 
     public RegistrationController(WebClient webClient, RegistrationRepository registrationRepository) {
@@ -32,23 +31,8 @@ public class RegistrationController {
 
     @PostMapping
     public Registration create(@RequestBody @Valid Registration registration) {
-        Product product = webClient.get()
-                .uri("/products/{id}", registration.productId())
-//                .uri(uriBuilder -> uriBuilder
-//                        .path("/products/")
-//                        .queryParam("eventId", registration.productId())
-//                        .build())
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .retrieve()
-                .bodyToMono(Product.class)
-                .block();
-
-        Event event = webClient.get()
-                .uri("/events/{id}", product.eventId())
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .retrieve()
-                .bodyToMono(Event.class)
-                .block();
+        Product product = eventsClient.getProductById(registration.productId());
+        Event event = eventsClient.getEventById(product.eventId());
         String ticketCode = UUID.randomUUID().toString();
 
         return registrationRepository.save(new Registration(null, registration.productId(), event.name(), product.price(), ticketCode, registration.attendeeName()));
